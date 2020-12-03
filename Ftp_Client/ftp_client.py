@@ -67,14 +67,13 @@ class FTP_Client():
         }
 
         while True:
-            print('\033[1;31;1m  欢迎来到 FTP 系统 \033[0m')
+            print('\033[1;31;1m 欢迎来到 FTP 系统 \033[0m')
             user_name = input('username: ').strip()
             user_password = input('password: ').strip()
 
             m = hashlib.md5()
             m.update(user_password.encode('utf-8'))
             user_password = m.hexdigest()
-            print('user_password:', user_password)
 
             user_dic = {
                 'user_name': user_name,
@@ -83,7 +82,7 @@ class FTP_Client():
 
             self.client.send(json.dumps(user_dic).encode('utf-8'))
             login_result = self.client.recv(1024).decode()
-            print('登陆信息：', login_msg[login_result])
+            print('\033[1;31;1m 登陆信息： %s \033[0m' % login_msg[login_result])
 
             if login_result == '200':
                 break
@@ -98,6 +97,7 @@ class FTP_Client():
         self.login()
 
         while True:
+            print()
             cmd = input(">> ").strip()
 
             if len(cmd) == 0:
@@ -128,7 +128,7 @@ class FTP_Client():
 
             self.client.send(json.dumps(msg_dic).encode('utf-8'))
             cmd_total_size = self.client.recv(1024).decode()
-            print('cmd_total_size:', cmd_total_size)
+            print('\033[1;31;1m cmd_total_size: % \033[0m' % cmd_total_size)
             self.client.send('已准备OK，可以接受'.encode('utf-8'))
 
             received_size = 0
@@ -141,7 +141,7 @@ class FTP_Client():
                 print(received_data.decode())
 
         else:
-            print('命令格式错误！ len: ', len(cmd_split))
+            print('\033[1;31;1m 命令格式错误！ len: %s \033[0m' % len(cmd_split))
             print(cmd_split)
 
         return None
@@ -190,7 +190,7 @@ class FTP_Client():
             print(return_msg)
 
         else:
-            print('命令格式错误')
+            print('\033[1;31;1m 命令格式错误 \033[0m')
 
     def progress(self, percent):
         """
@@ -201,7 +201,7 @@ class FTP_Client():
         if percent > 1:
             percent = 1
         res = int(50 * percent) * '#'
-        print('\r[%-50s] %d%%' % (res, int(100 * percent)), end='')
+        print('\033[1;31;1m \r[%-50s] %d%% \033[0m' % (res, int(100 * percent)), end='')
 
     def cmd_get(self, *args):
         """
@@ -229,7 +229,7 @@ class FTP_Client():
             print('file_total_size', file_total_size)
             if file_total_size == -1:
                 self.client.send(b'100')
-                print('服务端文件不存在，无法下载')
+                print('\033[1;31;1m 服务端文件不存在，无法下载\033[0m')
             else:
                 des_filename = '%s/Data/%s' % (BASE_DIR, src_filename)
                 if not os.path.isfile(des_filename):
@@ -237,22 +237,22 @@ class FTP_Client():
                     received_size = 0
                     self.cmd_get_get_data(des_filename, received_size, file_total_size)
 
-                else:  # 文件已存在，后续补充功能
+                else:
                     received_size = os.stat(des_filename).st_size
                     if received_size < file_total_size:
                         """ 目标文件小于下载文件，进行断点续传 """
                         self.client.send(b'300')
-                        print('文件已存在，但是不完整，需要断点续传')
+                        print('\033[1;31;1m 文件已存在，但是不完整，需要断点续传\033[0m')
                         print('received_size:', received_size)
                         self.cmd_get_get_data(des_filename, received_size, file_total_size)
 
                     elif received_size == file_total_size:
                         """ 目标文件等于下载文件 """
                         self.client.send(b'400')
-                        print('文件已存在，无需下载')
+                        print('\033[1;31;1m 文件已存在，无需下载\033[0m')
                     else:
                         self.client.send(b'500')
-                        print('客户端文件错误，请重新下载')
+                        print('\033[1;31;1m 客户端文件错误，请重新下载\033[0m')
 
         return None
 
@@ -268,7 +268,6 @@ class FTP_Client():
                     size = 1024
                 else:
                     size = file_total_size - received_size
-                    print('last receive:', size)
 
                 data = self.client.recv(size)
                 received_size += len(data)
@@ -284,7 +283,10 @@ class FTP_Client():
                     'client_data_size': received_size
                 }
                 self.client.send(json.dumps(client_data).encode('utf-8'))
-                print('文件下载完成，文件路径；', des_filename)
+                print()
+                print('\033[1;31;1m 文件下载完成，文件路径: %s\033[0m' % des_filename)
+
+        return None
 
     def cmd_put(self, *args):
         """
@@ -320,23 +322,23 @@ class FTP_Client():
                     self.cmd_put_put_data(file_total_size, filename)
 
                 elif server_response == 300:  # 文件已存在，后续补充功能
-                    print('文件已存在，但是不完整，需要断点续传')
+                    print('\033[1;31;1m 文件已存在，但是不完整，需要断点续传\033[0m')
                     self.cmd_put_put_data(file_total_size, filename)
 
                 elif server_response == 400:
-                    print('文件已存在')
+                    print('\033[1;31;1m 文件已存在\033[0m')
 
                 elif server_response == 500:
-                    print('文件已存在服务器,但数据错误，请先删除服务器端文件')
+                    print('\033[1;31;1m 文件已存在服务器,但数据错误，请先删除服务器端文件\033[0m')
 
                 else:
-                    print('未知错误！')
+                    print('\033[1;31;1m 未知错误！\033[0m')
 
             else:
                 """100: 客户端无此文件 """
-                print('%s 目录下不存在此文件，请确认后重新上传文件' % filename)
+                print('\033[1;31;1m %s 目录下不存在此文件，请确认后重新上传文件\033[0m' % filename)
         else:
-            print('命令错误，请重新执行命令')
+            print('\033[1;31;1m 命令错误，请重新执行命令')
 
         return None
 
@@ -359,8 +361,6 @@ class FTP_Client():
 
             percent = server_data_size / file_total_size
             self.progress(percent)
-
-        print()
 
         return None
 

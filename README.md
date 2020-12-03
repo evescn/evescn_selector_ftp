@@ -160,9 +160,11 @@ cmd_total_size: 13
 file_total_size 6
 last receive: 6
 [##################################################] 100%文件下载完成，文件路径； /home/Ftp_Client/Data/1
+
 >> get 2
 file_total_size -1
 服务端文件不存在，无法下载
+
 >> get 1
 file_total_size 6
 文件已存在，无需下载
@@ -170,9 +172,11 @@ file_total_size 6
 ## put 功能
 >> put fstab.5
 /home/Ftp_Client/Data/fstab.5 目录下不存在此文件，请确认后重新上传文件
+
 >> put fstab
 server_response: 200
 [##################################################] 100%
+
 >> put 1
 server_response: 400
 文件已存在
@@ -185,7 +189,8 @@ server_response: 400
 username: gmkk
 password: 123
 user_password: 202cb962ac59075b964b07152d234b70
-登陆信息： 登陆系统成功
+ 登陆信息： 登陆系统成功
+
 >> get test.img.3
 file_total_size 45008228
 [######                                            ] 13%
@@ -209,14 +214,13 @@ KeyboardInterrupt
 username: gmkk
 password: 123
 user_password: 202cb962ac59075b964b07152d234b70
-登陆信息： 登陆系统成功
+ 登陆信息： 登陆系统成功
+
 >> get test.img.3
 file_total_size 45008228
-文件已存在，但是不完整，需要断点续传
+ 文件已存在，但是不完整，需要断点续传
 received_size: 5912576
-[################################################# ] 99%
-last receive: 356
 [##################################################] 100%
-文件下载完成，文件路径； /home/Ftp_Client/Data/test.img.3
+ 文件下载完成，文件路径； /home/Ftp_Client/Data/test.img.3
 
 ```
